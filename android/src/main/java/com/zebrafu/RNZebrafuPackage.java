@@ -1,6 +1,6 @@
 package com.zebrafu;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,9 +11,14 @@ import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
 
 public class RNZebrafuPackage implements ReactPackage {
+
+    static final String TAG = "Zebrafu";
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList(new RNZebrafuModule(reactContext));
+        List<NativeModule> modules = new ArrayList<>();
+        modules.add(new RNZebrafuModule(reactContext));
+        return modules;
     }
 
     // Deprecated from RN 0.47
