@@ -2,6 +2,7 @@ package com.zebrafu;
 
 import android.util.Log;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -21,23 +22,25 @@ public class RNZebrafuModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printOverTCP(String ipAddress, String zplData) {
-        doPrint(new TcpConnection(ipAddress, TcpConnection.DEFAULT_ZPL_TCP_PORT), zplData);
+    public void printOverTCP(String ipAddress, String zplData, Promise promise) {
+        doPrint(new TcpConnection(ipAddress, TcpConnection.DEFAULT_ZPL_TCP_PORT), zplData, promise);
     }
 
     @ReactMethod
-    public void printOverBT(String macAddress, String zplData) {
-        doPrint(new BluetoothConnection(macAddress), zplData);
+    public void printOverBT(String macAddress, String zplData, Promise promise) {
+        doPrint(new BluetoothConnection(macAddress), zplData, promise);
     }
 
-    private void doPrint(Connection connection, String zplData) {
+    private void doPrint(Connection connection, String zplData, Promise promise) {
         try {
             connection.open();
             if (connection.isConnected()) {
                 connection.write(zplData.getBytes());
+                promise.resolve(true);
             }
         } catch (ConnectionException ex) {
             Log.e("ZEBRA", "Failed to connect zebra printer");
+            promise.reject(new Exception("Failed to connect zebra printer"));
         } finally {
             try {
                 connection.close();
