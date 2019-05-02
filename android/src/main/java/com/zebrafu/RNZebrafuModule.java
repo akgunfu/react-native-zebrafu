@@ -31,23 +31,30 @@ public class RNZebrafuModule extends ReactContextBaseJavaModule {
         doPrint(new BluetoothConnection(macAddress), zplData, promise);
     }
 
-    private void doPrint(Connection connection, String zplData, Promise promise) {
-        try {
-            connection.open();
-            if (connection.isConnected()) {
-                connection.write(zplData.getBytes());
-                promise.resolve(true);
+    private void doPrint(final Connection connection, final String zplData, final Promise promise) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    connection.open();
+                    if (connection.isConnected()) {
+                        connection.write(zplData.getBytes());
+                        promise.resolve(true);
+                    }
+                } catch (ConnectionException ex) {
+                    Log.e("ZEBRA", "Failed to connect zebra printer");
+                    promise.reject(new Exception("Failed to connect zebra printer"));
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (ConnectionException ex) {
+                        Log.e("ZEBRA", "Failed to close active connection");
+                    }
+                }
             }
-        } catch (ConnectionException ex) {
-            Log.e("ZEBRA", "Failed to connect zebra printer");
-            promise.reject(new Exception("Failed to connect zebra printer"));
-        } finally {
-            try {
-                connection.close();
-            } catch (ConnectionException ex) {
-                Log.e("ZEBRA", "Failed to close active connection");
-            }
-        }
+        };
+
+        new Thread(runnable).start();
     }
 
     @Override
