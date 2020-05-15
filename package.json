@@ -11,7 +11,7 @@
   ],
   "author": "akgunfu",
   "license": "",
-  "dependencies": {
-    "react-native": "^0.62.2"
+  "peerDependencies": {
+    "react-native": ">=0.61.5"
   }
 }
